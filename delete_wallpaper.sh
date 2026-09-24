@@ -3,6 +3,15 @@ set -euo pipefail
 
 DEST_DIR="${HOME}/Pictures/Wallpapers/Wallhaven"
 
+# Hash database files
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+HASH_DB_DIR="${HOME}/.local/share/wallpaper-hashes"
+DELETED_HASHES="${HASH_DB_DIR}/deleted.txt"
+
+# Initialize hash database
+mkdir -p "$HASH_DB_DIR"
+touch "$DELETED_HASHES"
+
 # Cron/hotkey may run without the user desktop session environment.
 # Export DBUS_SESSION_BUS_ADDRESS so gsettings communicates with the GNOME daemon.
 PID=$(pgrep -u "$USER" gnome-session | head -n 1 || true)
@@ -30,6 +39,18 @@ fi
 # Only delete files that live in our wallpaper pool, to avoid nuking anything else.
 case "$CURRENT_PIC" in
     "$DEST_DIR"/*)
+        # Hash the image before deleting it
+        if command -v convert &> /dev/null && [[ -x "$SCRIPT_DIR/hash_image.sh" ]]; then
+            HASH=$("$SCRIPT_DIR/hash_image.sh" "$CURRENT_PIC" 2>/dev/null || echo "")
+            if [[ -n "$HASH" ]]; then
+                # Record the hash so we never download this image again
+                if ! grep -qF "$HASH" "$DELETED_HASHES" 2>/dev/null; then
+                    echo "$HASH" >> "$DELETED_HASHES"
+                    echo "Recorded hash of deleted image to prevent re-download"
+                fi
+            fi
+        fi
+
         rm -f "$CURRENT_PIC"
         echo "Deleted: $CURRENT_PIC"
         ;;

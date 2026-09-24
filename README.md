@@ -20,12 +20,13 @@ Automatically fetch and rotate wallpapers on your Ubuntu desktop. This project u
 - `jq` - For parsing JSON responses
 - `gsettings` - For setting GNOME wallpaper (included with GNOME)
 - `cron` - For task scheduling
+- `imagemagick` - For duplicate detection (optional but recommended)
 
 ### Install Dependencies
 
 ```bash
 sudo apt update
-sudo apt install curl jq
+sudo apt install curl jq imagemagick
 ```
 
 ## Installation
@@ -49,6 +50,20 @@ sudo apt install curl jq
    ```bash
    ./manage_cron.sh status
    ```
+
+4. **(Optional) Hash existing wallpapers:**
+   ```bash
+   ./sync_existing_hashes.sh
+   ```
+   This prevents re-downloading wallpapers you already have.
+
+## Duplicate Detection
+
+The scripts track image hashes to prevent re-downloading duplicates or wallpapers you've deleted. Two databases are maintained in `~/.local/share/wallpaper-hashes/`:
+- `downloaded.txt` - Hashes of all downloaded images
+- `deleted.txt` - Hashes of deleted images (never re-download)
+
+When you delete a wallpaper with `./delete_wallpaper.sh`, its hash is recorded so it won't be downloaded again. Run `./sync_existing_hashes.sh` once to initialize tracking for your current collection.
 
 ## Usage
 
@@ -187,7 +202,7 @@ The script automatically:
 ### `fetch_wallpapers.sh`
 1. Queries Wallhaven API with specified filters
 2. Downloads wallpapers to `~/Pictures/Wallpapers/Wallhaven/`
-3. Skips files already in the collection
+3. Hashes each image and skips duplicates or previously deleted wallpapers
 4. Removes oldest wallpapers if pool exceeds `MAX_POOL_SIZE`
 
 ### `change_wallpaper.sh`
