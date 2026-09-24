@@ -31,10 +31,10 @@ while IFS= read -r -d '' IMAGE; do
 
     if [[ -n "$TEMP_HASH" ]]; then
         if grep -qF "$TEMP_HASH" "$DOWNLOADED_HASHES" 2>/dev/null; then
-            ((SKIPPED++))
+            SKIPPED=$((SKIPPED + 1))
         else
             echo "$TEMP_HASH" >> "$DOWNLOADED_HASHES"
-            ((COUNT++))
+            COUNT=$((COUNT + 1))
             echo "Hashed: $(basename "$IMAGE")"
         fi
     fi

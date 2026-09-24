@@ -83,21 +83,21 @@ for (( page=1; page<=PAGES_TO_FETCH; page++ )); do
                        grep -qF "$HASH" "$DELETED_HASHES" 2>/dev/null; then
                         # Duplicate found - delete it
                         rm -f "$TARGET_FILE"
-                        ((DUPLICATE_COUNT++))
+                        DUPLICATE_COUNT=$((DUPLICATE_COUNT + 1))
                         echo "Skipped duplicate: $FILENAME"
                     else
                         # New image - record its hash
                         echo "$HASH" >> "$DOWNLOADED_HASHES"
-                        ((DOWNLOADED_COUNT++))
+                        DOWNLOADED_COUNT=$((DOWNLOADED_COUNT + 1))
                         echo "Downloaded: $FILENAME"
                     fi
                 else
                     # Hashing failed, but keep the image
-                    ((DOWNLOADED_COUNT++))
+                    DOWNLOADED_COUNT=$((DOWNLOADED_COUNT + 1))
                 fi
             else
                 # ImageMagick not available, just keep the image
-                ((DOWNLOADED_COUNT++))
+                DOWNLOADED_COUNT=$((DOWNLOADED_COUNT + 1))
             fi
         fi
     done

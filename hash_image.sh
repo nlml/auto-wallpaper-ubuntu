@@ -18,7 +18,8 @@ fi
 # This creates a simple perceptual hash that's resistant to minor changes
 
 HASH=$(convert "$IMAGE_FILE" -resize 8x8! -colorspace Gray -depth 8 txt:- 2>/dev/null | \
-    grep -oP '(?<=gray\()[0-9]+' | \
+    grep -oE 'graya?\([0-9]+' | \
+    cut -d'(' -f2 | \
     tr '\n' ' ' | \
     md5sum | \
     cut -d' ' -f1)
