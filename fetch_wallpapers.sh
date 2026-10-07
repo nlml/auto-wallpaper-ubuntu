@@ -3,7 +3,7 @@ set -euo pipefail
 
 # Configuration
 DEST_DIR="${HOME}/Pictures/Wallpapers/Wallhaven"
-MAX_POOL_SIZE=100
+MAX_POOL_SIZE=10000
 PAGES_TO_FETCH=1
 RESOLUTIONS="3840x2160"
 RATIOS="16x9"
